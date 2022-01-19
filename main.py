@@ -1,31 +1,12 @@
 #   za 1 bod:
 #   t<9,n<5, m<9
-from collections import deque
-
-
-def ack_i(m, n):
-
-    stack = deque([])
-    stack.extend([m, n])
-
-    while len(stack) > 1:
-        n, m = stack.pop(), stack.pop()
-
-        if   m == 0:
-            stack.append(n + 1)
-        elif n == 0:
-            stack.extend([m-1, 1])
-        else:
-            stack.extend([m-1, m, n-1])
-
-    return stack[0]
 
 
 saved = {}
 
 
 def A_rec(x, t, n):
-    print("Current:",t,",",n)
+
     if n == 0:
         return t + 1
     if n == 1:
@@ -37,37 +18,35 @@ def A_rec(x, t, n):
     if t == 0:
         return 1
 
-    if (n, t) in saved:
-        print("succes",(n, t))
-        new_t = saved[(n, t)]
-    else:
-
-        print("No", (n, t), "A(", x, ",", t - 1, ",", n, ")")
-        saved[(n, t)] = A_rec(x, t - 1, n)
-        new_t = saved[(n, t)]
-        print("Added add")
-    print(saved)
-    new_rez = A_rec(x, new_t, n - 1)
-
-    return new_rez
+    print("ASSERT", t, n)
+    assert False
 
 
-def ae(t, n, m):
-
+def ae(t, n, m, steps=False):
     for nn in range(n + 1):
         for tt in range(t + 1):
-            print("Adding", (nn, tt))
-            saved[(nn, tt)] = A_rec(3, tt, nn)
+            # print("Adding n=", nn, "t=", tt)
 
-    return A_rec(3, t, n) % 2 ** m
+            if 0 <= nn <= 3:
+                saved[(nn, tt)] = A_rec(3, tt, nn) % 2 ** m
+
+            elif (nn, tt - 1) in saved:
+                new_y = saved[(nn, tt - 1)]
+                saved[(nn, tt)] = A_rec(3, new_y, nn - 1) % 2 ** m
+
+            else:
+                saved[(nn, tt)] = A_rec(3, tt, nn) % 2 ** m
+            if steps:
+                print("A(n=", nn, "t=", tt, ") =", saved[(nn, tt)])
+
+    y = saved[(n, t - 1)]
+    return A_rec(3, y, n - 1) % 2 ** m
 
 
 def main():
-    print(ae(t=7, n=4, m=8))
-    # print(saved)
+    print(ae(t=7, n=4, m=8,steps=True))
 
 
 if __name__ == '__main__':
     main()
 
-    print("end")
